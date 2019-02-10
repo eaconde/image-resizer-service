@@ -1,0 +1,22 @@
+{
+  "name": "image-resizer-service",
+  "version": "1.0.0",
+  "description": "Image resizer for Tala (Reimbursement) app",
+  "main": "resize.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Serverless",
+    "Image Resize",
+    "Lambda",
+    "S3",
+    "Sharp"
+  ],
+  "author": "Eric Conde",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-plugin-existing-s3": "^2.3.0",
+    "sharp": "0.18.3"
+  }
+}

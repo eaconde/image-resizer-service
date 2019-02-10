@@ -1,0 +1,53 @@
+service: image-resizer-service
+
+plugins:
+  - serverless-plugin-existing-s3
+  # tracing can be enabled on dev for debugging
+  # npm i serverless-plugin-tracing
+  # - serverless-plugin-tracing
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${env:STAGE, 'dev'}
+  profile: serverless-admin
+  tracing: true
+  region: ${env:REGION, 'us-east-1'}
+  environment:
+    BUCKET: ${env:BUCKET}
+    REGION: ${env:REGION}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+      Resource: 
+        - "arn:aws:s3:::${env:BUCKET}"
+        - "arn:aws:s3:::${env:BUCKET}/*"
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
+      Resource: 
+        - "arn:aws:s3:::${env:BUCKET}"
+        - "arn:aws:s3:::${env:BUCKET}/*"
+    # tracing can be enabled on dev for debugging
+    # - Effect: "Allow"
+    #   Action:
+    #     - "xray:PutTraceSegments"
+    #     - "xray:PutTelemetryRecords"
+    #   Resource:
+    #     - "*"
+
+functions:
+  resize:
+    handler: resize.handler
+    events:
+      - existingS3: 
+          bucket: ${env:BUCKET}
+          event: s3:ObjectCreated:Put
+          rules:
+            - prefix: images/${env:STAGE, 'dev'}
+      - existingS3: 
+          bucket: ${env:BUCKET}
+          event: s3:ObjectCreated:CompleteMultipartUpload
+          rules:
+            - prefix: images/${env:STAGE, 'dev'}
